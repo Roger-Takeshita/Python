@@ -22,8 +22,9 @@ pdf.set_font("helvetica", "", 16)  # font-family, normal, font-size
 #   new_y=YPos.NEXT = new line
 #   new_x=XPos.LEFT = alignment
 #   border=True
-pdf.cell(40, 10, "Hello World", new_x=XPos.LEFT, new_y=YPos.NEXT)
-pdf.cell(80, 10, "Good By World", border=True)
+pdf.cell(120, 120, "Hello World", new_x=XPos.LEFT, new_y=YPos.NEXT, border=True)
+pdf.set_font("times", "", 12)
+pdf.cell(80, 10, "Good By World")
 
 # Export pdf
-pdf.output("fpdf2.pdf")
+pdf.output("fpdf2_part_1.pdf")
