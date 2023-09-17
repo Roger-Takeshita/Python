@@ -183,3 +183,4 @@ roger-that/
 roger-that.md
 **/temp
 env_*
+.env_*

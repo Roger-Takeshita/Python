@@ -5,8 +5,8 @@ from fpdf.enums import XPos, YPos
 class PDF(FPDF):
     def header(self):
         # Logo
-        #                            x, y, width, height
-        self.image("blue-jays.jpg", 10, 8, 25)
+        #                                   x, y, width, height
+        self.image("assets/blue-jays.jpg", 10, 8, 25)
         # Font
         self.set_font("helvetica", "B", 20)
         # Padding
@@ -37,4 +37,4 @@ for i in range(1, 41):
     pdf.cell(0, 10, f"This is line {i}", new_x=XPos.LEFT, new_y=YPos.NEXT)
 
 # Export pdf
-pdf.output("fpdf2_part_2.pdf")
+pdf.output("pdfs/fpdf2_part_2.pdf")

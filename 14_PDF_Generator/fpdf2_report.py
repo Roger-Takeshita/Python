@@ -128,7 +128,7 @@ class PDF(FPDF):
 
     def add_sub_header(self, student_name, report_date):
         self.ln(5)
-        self.image("./prepbox_logo.png", x=77, y=11, w=60, h=0, link=website_link)
+        self.image("assets/prepbox_logo.png", x=77, y=11, w=60, h=0, link=website_link)
         self.set_text_color(162, 162, 162)
         self.ln(30)
         self.set_font("helvetica", "B", 14)
@@ -309,10 +309,10 @@ def generate_report(report_data):
 
     pdf.add_images(r.session_data["image"].tolist(), r)
 
-    pdf.output(f"{r.student_id}_{r.title}.pdf")
+    pdf.output(f"pdfs/{r.student_id}_{r.title}.pdf")
 
 
-f = open("data.json")
+f = open("assets/data.json")
 ev = json.load(f)
 
 generate_report(ev)

@@ -67,7 +67,7 @@ pdf.set_auto_page_break(auto=True, margin=15)
 
 # First page
 pdf.add_page()
-pdf.image("background_image.png", x=-0.5, w=pdf.w + 1)
+pdf.image("assets/background_image.png", x=-0.5, w=pdf.w + 1)
 
 # Variables
 website_link = "http://www.gutenberg.org/cache/epub/164/pg164.txt"
@@ -81,7 +81,7 @@ pdf.cell(0, 10, "Chapter 1", link=ch1_link)
 pdf.ln()
 pdf.cell(0, 10, "Chapter 2", link=ch2_link)
 
-pdf.chapter(1, "A RUNAWAY REEF", "chp1.txt", ch1_link)
-pdf.chapter(2, "THE PROS AND CONS", "chp2.txt", ch2_link)
+pdf.chapter(1, "A RUNAWAY REEF", "assets/chp1.txt", ch1_link)
+pdf.chapter(2, "THE PROS AND CONS", "assets/chp2.txt", ch2_link)
 
-pdf.output("fpdf2_part_4.pdf")
+pdf.output("pdfs/fpdf2_part_4.pdf")

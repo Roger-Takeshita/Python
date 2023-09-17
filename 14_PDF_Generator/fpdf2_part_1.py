@@ -27,4 +27,4 @@ pdf.set_font("times", "", 12)
 pdf.cell(80, 10, "Good By World")
 
 # Export pdf
-pdf.output("fpdf2_part_1.pdf")
+pdf.output("pdfs/fpdf2_part_1.pdf")

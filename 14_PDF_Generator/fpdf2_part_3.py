@@ -68,8 +68,8 @@ pdf = PDF(orientation="P", unit="mm", format="Letter")
 # Set auto page break
 pdf.set_auto_page_break(auto=True, margin=15)
 pdf.add_page()
-pdf.chapter(1, "A RUNAWAY REEF", "chp1.txt")
-pdf.chapter(2, "THE PROS AND CONS", "chp2.txt")
+pdf.chapter(1, "A RUNAWAY REEF", "assets/chp1.txt")
+pdf.chapter(2, "THE PROS AND CONS", "assets/chp2.txt")
 
 # Export pdf
-pdf.output("fpdf2_part_3.pdf")
+pdf.output("pdfs/fpdf2_part_3.pdf")
