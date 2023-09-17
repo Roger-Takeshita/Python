@@ -134,79 +134,107 @@ class PDF(FPDF):
     def add_header(self, student_name, report_date):
         self.set_xy(0, 0)
         self.set_fill_color(57, 143, 229)
-        self.cell(300, 2, "", new_x=XPos.RIGHT, new_y=YPos.NEXT, align="C", fill=True)
+        self.cell(300, 2, "", align="C", fill=True)
         self.ln(5)
-        self.image("./prepbox_logo.png", x=77, y=11, w=60, h=0, type="", link="")
+        self.image("./prepbox_logo.png", x=77, y=11, w=60, h=0, link="")
         self.set_text_color(162, 162, 162)
         self.ln(30)
         self.set_font("helvetica", "B", 14)
-        self.cell(0, 8, student_name + " | Date: " + report_date, 0, 1, "C")
+        self.add_new_cell(0, 8, student_name + " | Date: " + report_date)
         self.ln(1)
 
     def add_progress(self, course, progress):
         self.set_fill_color(162, 162, 162)
         self.cell(10)
-        self.cell(165, 0.2, "", 0, 1, "C", fill=True)
+        self.add_new_cell(165, 0.2, "", "C", True)
         self.set_fill_color(0, 176, 240)
         self.set_text_color(0, 0, 0)
         self.set_font("helvetica", "B", 12)
         self.ln(3)
-        self.cell(0, 8, course + " Mastery Level", 0, 1, "C")
+        self.add_new_cell(0, 8, course + " Mastery Level")
         self.ln(3)
         self.set_font("helvetica", "", 12)
         self.cell(10)
-        self.cell(35, 10, "", 0, 0, "L")
+        self.cell(35, 10, "", align="L")
 
         for i in range(0, 99):
             if i == 0 and i + 1 <= progress:
-                self.cell(1, 10, "", "L,B,T", 0, "C", fill=True)
+                self.cell(1, 10, "", "L,B,T", align="C", fill=True)
             elif i > 0 and i + 1 <= progress:
-                self.cell(1, 10, "", "B,T", 0, "C", fill=True)
+                self.cell(1, 10, "", "B,T", align="C", fill=True)
             elif i > 0 and i + 1 <= progress:
-                self.cell(1, 10, "", "B,T", 0, "C")
+                self.cell(1, 10, "", "B,T", align="C")
             else:
-                self.cell(1, 10, "", "B,T", 0, "C")
+                self.cell(1, 10, "", "B,T", align="C")
 
         if progress == 100:
-            self.cell(1, 10, "", "R,B,T", 1, "C", fill=True)
+            self.cell(
+                1,
+                10,
+                "",
+                "R,B,T",
+                new_x=XPos.LMARGIN,
+                new_y=YPos.NEXT,
+                align="C",
+                fill=True,
+            )
         else:
-            self.cell(1, 10, "", "R,B,T", 1, "C")
+            self.cell(
+                1,
+                10,
+                "",
+                "R,B,T",
+                new_x=XPos.LMARGIN,
+                new_y=YPos.NEXT,
+                align="C",
+            )
 
         self.set_fill_color(57, 143, 229)
         self.cell(45)
-        self.cell(progress - 4, 10, "", 0, 0, "C")
-        self.cell(10, 10, str(progress) + "%", 0, 1, "L")
+        self.cell(progress - 4, 10, "", align="C")
+        self.add_new_cell(10, 10, str(progress) + "%", "L")
         self.ln(3)
 
     def add_line(self):
         self.set_fill_color(162, 162, 162)
         self.cell(10)
-        self.cell(165, 0.2, "", 0, 1, "C", fill=True)
+        self.add_new_cell(165, 0.2, "", "C", True)
         self.set_fill_color(57, 143, 229)
         self.ln(3)
+
+    def add_new_cell(self, width, height, text, align="C", fill=False):
+        self.cell(
+            width,
+            height,
+            text,
+            new_x=XPos.LMARGIN,
+            new_y=YPos.NEXT,
+            align=align,
+            fill=fill,
+        )
 
     def add_stats(self, student_name, session_questions, session_minutes):
         stats = (
             str(session_questions) + " problems in " + str(session_minutes) + " minutes"
         )
         self.set_font("helvetica", "B", 12)
-        self.cell(0, 10, "Hi! " + student_name + " has just solved", 0, 1, "C")
+        self.add_new_cell(0, 10, "Hi! " + student_name + " has just solved")
         self.set_font("helvetica", "", 12)
-        self.cell(0, 7, stats, 0, 1, "C")
+        self.add_new_cell(0, 7, stats)
         self.ln(3)
 
     def add_performance(self, join_date, total_questions):
         self.set_font("helvetica", "B", 12)
-        self.cell(0, 10, "Overall Performance Trends", 0, 1, "C")
+        self.add_new_cell(0, 10, "Overall Performance Trends")
         self.set_font("helvetica", "", 12)
-        self.cell(0, 7, "Join Date:  " + join_date, 0, 1, "C")
-        self.cell(0, 7, "Questions Solved to Date:  " + str(total_questions), 0, 1, "C")
+        self.add_new_cell(0, 7, "Join Date:  " + join_date)
+        self.add_new_cell(0, 7, "Questions Solved to Date:  " + str(total_questions))
         self.ln(3)
 
     def add_graph(self, sessions):
         graph_file_path = "/tmp/graph.png"
         generate_graph(sessions, graph_file_path)
-        self.image(graph_file_path, x=3, y=145, w=200, h=0, type="", link="")
+        self.image(graph_file_path, x=3, y=145, w=200, h=0, link="")
 
     def add_images(self, imgl, report):
         for i in range(0, len(imgl)):
@@ -214,36 +242,34 @@ class PDF(FPDF):
                 self.set_xy(7, 150)
                 self.ln(1)
                 self.cell(7)
-                self.cell(44, 7, " Question Solved " + str(i + 1), 0, 0, align="L")
+                self.cell(44, 7, " Question Solved " + str(i + 1), align="L")
                 if report.session_data.accuracy[i] == 1:
-                    self.cell(10, 7, " - Correct", 0, 1, "L")
+                    self.add_new_cell(10, 7, " - Correct", "L")
                 else:
-                    self.cell(10, 7, " - Incorrect", 0, 0, "L")
+                    self.cell(10, 7, " - Incorrect", align="L")
                 self.image(
                     report.session_data.image[i],
                     x=18,
                     y=165,
                     w=150,
                     h=109.489,
-                    type="PNG",
                 )
             else:
                 self.add_page()
                 self.ln(5)
                 self.set_font("helvetica", "B", 13)
                 self.cell(7)
-                self.cell(44, 7, " Question Solved " + str(i + 1), 0, 0, "L")
+                self.cell(44, 7, " Question Solved " + str(i + 1), align="L")
                 if report.session_data.accuracy[i] == 1:
-                    self.cell(10, 7, " - Correct", 0, 1, "L")
+                    self.add_new_cell(10, 7, " - Correct", "L")
                 else:
-                    self.cell(10, 7, " - Incorrect", 0, 0, "L")
+                    self.cell(10, 7, " - Incorrect", align="L")
                 self.image(
                     report.session_data.image[i],
                     x=18,
                     y=28,
                     w=150,
                     h=109.489,
-                    type="PNG",
                 )
                 self.ln(60)
 
