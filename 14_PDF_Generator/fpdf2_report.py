@@ -5,14 +5,13 @@ import json
 import matplotlib.pyplot as plt
 import pandas as pd
 
+website_link = "www.prepbox.io"
+
 
 def generate_graph(sessions, graph_file_path):
     df = pd.DataFrame(sessions)
-
-    # Create the figure and axes objects, specify the size and the dots per inches
     fig, ax = plt.subplots(figsize=(12, 7.5), dpi=96)
 
-    # Plot bars
     ax.bar(
         df["date"],
         df["correct_session"],
@@ -70,20 +69,14 @@ def generate_graph(sessions, graph_file_path):
     )
 
     # Remove the spines
-    ax.spines[["top", "left", "bottom", "right"]].set_visible(False)
+    ax.spines[["top", "right"]].set_visible(False)
 
     # Make the left spine thicker
     ax.spines["right"].set_linewidth(1.1)
 
-    # Add in line and rectangle on top
-    ax.plot(
-        [0.12, 0.9],
-        [0.98, 0.98],
-        transform=fig.transFigure,
-        clip_on=False,
-        color="#398FE5",
-        linewidth=0.6,
-    )
+    # Color axis
+    ax.spines["left"].set_color("#398FE5")
+    ax.spines["bottom"].set_color("#398FE5")
 
     # Add in title and subtitle
     ax.text(
@@ -105,9 +98,6 @@ def generate_graph(sessions, graph_file_path):
 
     # Set a white background
     fig.patch.set_facecolor("white")
-
-    # Add label on top of each bar
-    # ax.bar_label(bar1, labels=[f'{e:,.1f}' for e in delay_by_month['ArrDelay']], padding=3, color='black', fontsize=8)
 
     plt.savefig(graph_file_path)
 
@@ -131,17 +121,36 @@ class Report:
 
 
 class PDF(FPDF):
-    def add_header(self, student_name, report_date):
+    def header(self):
         self.set_xy(0, 0)
         self.set_fill_color(57, 143, 229)
         self.cell(300, 2, "", align="C", fill=True)
+
+    def add_sub_header(self, student_name, report_date):
         self.ln(5)
-        self.image("./prepbox_logo.png", x=77, y=11, w=60, h=0, link="")
+        self.image("./prepbox_logo.png", x=77, y=11, w=60, h=0, link=website_link)
         self.set_text_color(162, 162, 162)
         self.ln(30)
         self.set_font("helvetica", "B", 14)
-        self.add_new_cell(0, 8, student_name + " | Date: " + report_date)
+        self.add_new_cell(0, 8, f"{student_name} | Date: {report_date}")
         self.ln(1)
+
+    def footer(self):
+        self.set_text_color(169, 169, 169)
+        self.set_font("helvetica", "", 8)
+        self.set_y(-19)
+        self.cell(
+            0,
+            10,
+            website_link,
+            new_x=XPos.LMARGIN,
+            new_y=YPos.NEXT,
+            align="C",
+            link=website_link,
+        )
+        self.set_y(-15)
+        self.set_font("helvetica", "I", 8)
+        self.cell(0, 10, f"     Page {self.page_no()}/{{nb}}", align="C")
 
     def add_progress(self, course, progress):
         self.set_fill_color(162, 162, 162)
@@ -151,7 +160,7 @@ class PDF(FPDF):
         self.set_text_color(0, 0, 0)
         self.set_font("helvetica", "B", 12)
         self.ln(3)
-        self.add_new_cell(0, 8, course + " Mastery Level")
+        self.add_new_cell(0, 8, f"{course} Mastery Level")
         self.ln(3)
         self.set_font("helvetica", "", 12)
         self.cell(10)
@@ -192,15 +201,13 @@ class PDF(FPDF):
         self.set_fill_color(57, 143, 229)
         self.cell(45)
         self.cell(progress - 4, 10, "", align="C")
-        self.add_new_cell(10, 10, str(progress) + "%", "L")
+        self.add_new_cell(10, 10, f"${progress}%", "L")
         self.ln(3)
 
-    def add_line(self):
-        self.set_fill_color(162, 162, 162)
+    def add_line(self, r, g, b):
+        self.set_fill_color(r, g, b)
         self.cell(10)
         self.add_new_cell(165, 0.2, "", "C", True)
-        self.set_fill_color(57, 143, 229)
-        self.ln(3)
 
     def add_new_cell(self, width, height, text, align="C", fill=False):
         self.cell(
@@ -214,62 +221,69 @@ class PDF(FPDF):
         )
 
     def add_stats(self, student_name, session_questions, session_minutes):
-        stats = (
-            str(session_questions) + " problems in " + str(session_minutes) + " minutes"
-        )
+        stats = f"${session_questions} problems in {session_minutes} minutes"
         self.set_font("helvetica", "B", 12)
-        self.add_new_cell(0, 10, "Hi! " + student_name + " has just solved")
+        self.add_new_cell(0, 10, f"Hi! {student_name} has just solved")
         self.set_font("helvetica", "", 12)
         self.add_new_cell(0, 7, stats)
+        self.ln()
         self.ln(3)
 
     def add_performance(self, join_date, total_questions):
         self.set_font("helvetica", "B", 12)
         self.add_new_cell(0, 10, "Overall Performance Trends")
         self.set_font("helvetica", "", 12)
-        self.add_new_cell(0, 7, "Join Date:  " + join_date)
-        self.add_new_cell(0, 7, "Questions Solved to Date:  " + str(total_questions))
+        self.add_new_cell(0, 7, f"Join Date:  {join_date}")
+        self.add_new_cell(0, 7, f"Questions Solved to Date:  {total_questions}")
+        self.ln()
         self.ln(3)
 
     def add_graph(self, sessions):
         graph_file_path = "/tmp/graph.png"
         generate_graph(sessions, graph_file_path)
-        self.image(graph_file_path, x=3, y=145, w=200, h=0, link="")
+        img_width = 200
+        doc_width = self.w
+        x_width = (doc_width - img_width) / 2
+        self.image(graph_file_path, x=x_width, y=145, w=img_width, h=0, link="")
 
     def add_images(self, imgl, report):
+        img_width = 150
+        img_height = 109.489
+        doc_width = self.w
+        x_width = (doc_width - img_width) / 2
         for i in range(0, len(imgl)):
             if i % 2 == 1:
-                self.set_xy(7, 150)
+                self.set_xy(x_width, 150)
                 self.ln(1)
-                self.cell(7)
-                self.cell(44, 7, " Question Solved " + str(i + 1), align="L")
+                self.cell(x_width)
+                self.cell(44, 7, f" Question Solved {i + 1}", align="L")
                 if report.session_data.accuracy[i] == 1:
                     self.add_new_cell(10, 7, " - Correct", "L")
                 else:
                     self.cell(10, 7, " - Incorrect", align="L")
                 self.image(
                     report.session_data.image[i],
-                    x=18,
+                    x=x_width,
                     y=165,
-                    w=150,
-                    h=109.489,
+                    w=img_width,
+                    h=img_height,
                 )
             else:
                 self.add_page()
                 self.ln(5)
                 self.set_font("helvetica", "B", 13)
                 self.cell(7)
-                self.cell(44, 7, " Question Solved " + str(i + 1), align="L")
+                self.cell(44, 7, f" Question Solved {i + 1}", align="L")
                 if report.session_data.accuracy[i] == 1:
                     self.add_new_cell(10, 7, " - Correct", "L")
                 else:
                     self.cell(10, 7, " - Incorrect", align="L")
                 self.image(
                     report.session_data.image[i],
-                    x=18,
+                    x=x_width,
                     y=28,
-                    w=150,
-                    h=109.489,
+                    w=img_width,
+                    h=img_height,
                 )
                 self.ln(60)
 
@@ -278,16 +292,21 @@ def generate_report(report_data):
     r = Report(report_data)
     pdf = PDF()
 
-    pdf.add_page()
+    pdf.set_author("PrepBox")
+    pdf.set_auto_page_break(auto=True, margin=15)
     pdf.set_font("helvetica", "B", 14)
+    pdf.set_title(r.title)
+    pdf.add_page()
 
-    pdf.add_header(r.student_name, r.report_date)
+    pdf.add_sub_header(r.student_name, r.report_date)
     pdf.add_progress(r.course, r.progress)
-    pdf.add_line()
+    pdf.add_line(162, 162, 162)  # gray
     pdf.add_stats(r.student_name, r.session_questions, r.session_minutes)
-    pdf.add_line()
+    pdf.add_line(162, 162, 162)  # gray
     pdf.add_performance(r.join_date, r.total_questions)
+    pdf.add_line(57, 143, 229)  # blue
     pdf.add_graph(r.sessions)
+
     pdf.add_images(r.session_data["image"].tolist(), r)
 
     pdf.output(f"{r.student_id}_{r.title}.pdf")
