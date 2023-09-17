@@ -1,0 +1,83 @@
+{
+    "course": "11 Math",
+    "parent_name": "Roger",
+    "student_name": "Emily",
+    "progress": 67,
+    "report_date": "2023-06-30",
+    "join_date": "2023-03-02",
+    "total_questions": 452,
+    "session_questions": 7,
+    "session_minutes": 16,
+    "student_id": 0,
+    "title": "fpdf2_report",
+    "session_data": [
+        {
+            "subject": "Linear Systems",
+            "accuracy": 1,
+            "image": "https://prepanywhere.s3.amazonaws.com/live-classrooms/students/77246/79409/1/1688137201_question"
+        },
+        {
+            "subject": "Linear Systems",
+            "accuracy": 1,
+            "image": "https://prepanywhere.s3.amazonaws.com/live-classrooms/students/77246/79409/1/1688137201_question"
+        }
+    ],
+    "sessions": [
+        {
+            "date": "08-24  6:54 AM",
+            "correct_session": 10,
+            "incorrect_session": 3,
+            "correct_nosession": 0,
+            "incorrect_nosession": 0
+        },
+        {
+            "date": "08-24 06:54 AM",
+            "correct_session": 0,
+            "incorrect_session": 0,
+            "correct_nosession": 5,
+            "incorrect_nosession": 3
+        },
+        {
+            "date": "2023-06-26",
+            "correct_session": 17,
+            "incorrect_session": 3,
+            "correct_nosession": 0,
+            "incorrect_nosession": 0
+        },
+        {
+            "date": "2023-07-01",
+            "correct_session": 18,
+            "incorrect_session": 5,
+            "correct_nosession": 0,
+            "incorrect_nosession": 0
+        },
+        {
+            "date": "2023-07-08",
+            "correct_session": 0,
+            "incorrect_session": 0,
+            "correct_nosession": 5,
+            "incorrect_nosession": 3
+        },
+        {
+            "date": "2023-07-15",
+            "correct_session": 0,
+            "incorrect_session": 0,
+            "correct_nosession": 5,
+            "incorrect_nosession": 2
+        },
+        {
+            "date": "2023-07-22",
+            "correct_session": 5,
+            "incorrect_session": 4,
+            "correct_nosession": 10,
+            "incorrect_nosession": 3
+        },
+        {
+            "date": "2023-07-29",
+            "correct_session": 10,
+            "incorrect_session": 3,
+            "correct_nosession": 5,
+            "incorrect_nosession": 3
+        }
+    ]
+}
