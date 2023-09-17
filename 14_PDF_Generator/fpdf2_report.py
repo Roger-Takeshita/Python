@@ -78,19 +78,6 @@ def generate_graph(sessions, graph_file_path):
     ax.spines["left"].set_color("#398FE5")
     ax.spines["bottom"].set_color("#398FE5")
 
-    # Add in title and subtitle
-    ax.text(
-        x=0.12,
-        y=0.93,
-        s="Questions Solved in the Past 10 Sessions",
-        transform=fig.transFigure,
-        ha="left",
-        fontsize=16,
-        weight="bold",
-        alpha=0.8,
-    )
-    ax.legend(loc="upper left", fontsize=12)
-
     # Adjust the margins around the plot area
     plt.subplots_adjust(
         left=None, bottom=0.2, right=None, top=0.85, wspace=None, hspace=None
@@ -133,7 +120,6 @@ class PDF(FPDF):
         self.ln(30)
         self.set_font("helvetica", "B", 14)
         self.add_new_cell(0, 8, f"{student_name} | Date: {report_date}")
-        self.ln(1)
 
     def footer(self):
         self.set_text_color(169, 169, 169)
@@ -153,13 +139,10 @@ class PDF(FPDF):
         self.cell(0, 10, f"     Page {self.page_no()}/{{nb}}", align="C")
 
     def add_progress(self, course, progress):
-        self.set_fill_color(162, 162, 162)
-        self.cell(10)
-        self.add_new_cell(165, 0.2, "", "C", True)
         self.set_fill_color(0, 176, 240)
         self.set_text_color(0, 0, 0)
         self.set_font("helvetica", "B", 12)
-        self.ln(3)
+        self.ln(1)
         self.add_new_cell(0, 8, f"{course} Mastery Level")
         self.ln(3)
         self.set_font("helvetica", "", 12)
@@ -202,12 +185,13 @@ class PDF(FPDF):
         self.cell(45)
         self.cell(progress - 4, 10, "", align="C")
         self.add_new_cell(10, 10, f"${progress}%", "L")
-        self.ln(3)
 
-    def add_line(self, r, g, b):
+    def add_line(self, r, g, b, top=3, bottom=2):
         self.set_fill_color(r, g, b)
-        self.cell(10)
-        self.add_new_cell(165, 0.2, "", "C", True)
+        self.ln(top)
+        self.set_x(10)
+        self.add_new_cell(0, 0.2, "", "C", True)
+        self.ln(bottom)
 
     def add_new_cell(self, width, height, text, align="C", fill=False):
         self.cell(
@@ -221,13 +205,11 @@ class PDF(FPDF):
         )
 
     def add_stats(self, student_name, session_questions, session_minutes):
-        stats = f"${session_questions} problems in {session_minutes} minutes"
+        stats = f"{session_questions} problems in {session_minutes} minutes"
         self.set_font("helvetica", "B", 12)
         self.add_new_cell(0, 10, f"Hi! {student_name} has just solved")
         self.set_font("helvetica", "", 12)
         self.add_new_cell(0, 7, stats)
-        self.ln()
-        self.ln(3)
 
     def add_performance(self, join_date, total_questions):
         self.set_font("helvetica", "B", 12)
@@ -235,32 +217,38 @@ class PDF(FPDF):
         self.set_font("helvetica", "", 12)
         self.add_new_cell(0, 7, f"Join Date:  {join_date}")
         self.add_new_cell(0, 7, f"Questions Solved to Date:  {total_questions}")
-        self.ln()
-        self.ln(3)
 
-    def add_graph(self, sessions):
+    def add_graph(self, sessions, title):
         graph_file_path = "/tmp/graph.png"
         generate_graph(sessions, graph_file_path)
         img_width = 200
         doc_width = self.w
         x_width = (doc_width - img_width) / 2
-        self.image(graph_file_path, x=x_width, y=145, w=img_width, h=0, link="")
+        self.image(graph_file_path, x=x_width, y=135, w=img_width, h=0)
+        self.ln(4)
+        self.cell(7)
+        self.set_font("helvetica", "B", 12)
+        self.add_new_cell(0, 7, title, "L")
 
     def add_images(self, imgl, report):
         img_width = 150
         img_height = 109.489
         doc_width = self.w
         x_width = (doc_width - img_width) / 2
+
+        def add_question_accuracy(i, accuracy):
+            if accuracy == 1:
+                status = "Correct"
+            else:
+                status = "Incorrect"
+            self.ln(15)
+            self.cell(7)
+            self.set_font("helvetica", "B", 13)
+            self.cell(x_width, 7, f" Question Solved {i + 1} - {status}", align="L")
+
         for i in range(0, len(imgl)):
             if i % 2 == 1:
-                self.set_xy(x_width, 150)
-                self.ln(1)
-                self.cell(x_width)
-                self.cell(44, 7, f" Question Solved {i + 1}", align="L")
-                if report.session_data.accuracy[i] == 1:
-                    self.add_new_cell(10, 7, " - Correct", "L")
-                else:
-                    self.cell(10, 7, " - Incorrect", align="L")
+                add_question_accuracy(i, report.session_data.accuracy[i])
                 self.image(
                     report.session_data.image[i],
                     x=x_width,
@@ -270,14 +258,7 @@ class PDF(FPDF):
                 )
             else:
                 self.add_page()
-                self.ln(5)
-                self.set_font("helvetica", "B", 13)
-                self.cell(7)
-                self.cell(44, 7, f" Question Solved {i + 1}", align="L")
-                if report.session_data.accuracy[i] == 1:
-                    self.add_new_cell(10, 7, " - Correct", "L")
-                else:
-                    self.cell(10, 7, " - Incorrect", align="L")
+                add_question_accuracy(i, report.session_data.accuracy[i])
                 self.image(
                     report.session_data.image[i],
                     x=x_width,
@@ -285,7 +266,7 @@ class PDF(FPDF):
                     w=img_width,
                     h=img_height,
                 )
-                self.ln(60)
+                self.ln(120)
 
 
 def generate_report(report_data):
@@ -299,13 +280,14 @@ def generate_report(report_data):
     pdf.add_page()
 
     pdf.add_sub_header(r.student_name, r.report_date)
+    pdf.add_line(57, 143, 229, 0, 2)  # blue
     pdf.add_progress(r.course, r.progress)
-    pdf.add_line(162, 162, 162)  # gray
+    pdf.add_line(57, 143, 229, 1, 3)  # blue
     pdf.add_stats(r.student_name, r.session_questions, r.session_minutes)
-    pdf.add_line(162, 162, 162)  # gray
+    pdf.add_line(57, 143, 229)  # blue
     pdf.add_performance(r.join_date, r.total_questions)
     pdf.add_line(57, 143, 229)  # blue
-    pdf.add_graph(r.sessions)
+    pdf.add_graph(r.sessions, "Questions Solved in the Past 10 Sessions")
 
     pdf.add_images(r.session_data["image"].tolist(), r)
 
